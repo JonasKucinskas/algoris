@@ -122,7 +122,7 @@ def main():
 
             while True:
                 try:
-                    s = input('calc > ')
+                    s = input('input > ')
                 except EOFError:
                     break
                 if not s: continue
