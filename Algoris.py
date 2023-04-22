@@ -10,8 +10,16 @@ class Lexer():
     t_ignore  = ' \t'
 
     literals = {'=', '+', '-', '/', '*', '(', ')', '{', '}', ',', ';', '>', '<', '!'}
+    
+    #special keywords
+    
 
-    tokens = (
+    reserved = {
+        'if' : 'IF',
+        'else' : 'ELSE',
+    }
+
+    tokens = [
        'NUMBER',
        'PLUS',
        'MINUS',
@@ -24,7 +32,7 @@ class Lexer():
        'LE',
        'ME',
        'INC',
-    )
+    ] + list(reserved.values())
 
     # Regular expression rules for simple tokens
     t_PLUS    = r'\+'
@@ -40,9 +48,22 @@ class Lexer():
     t_ME = r'>='
     t_INC = r'\+\+'
 
-
+    
+    #precedence = (
+    #    ('left', '>', '<', t_LE, t_ME, t_EQ, t_NE),
+    #    ('left', '!'),
+    #    ('left', '+', '-'),
+    #    ('left', '*', '/'),
+    #    ('right', t_INC),
+    #)
 
     # A regular expression rule with some action code
+    
+    def t_ID(t):
+        r'[a-zA-Z_][a-zA-Z_0-9]*'
+        t.type = Lexer().reserved.get(t.value,'ID')  # Check for reserved words
+        return t
+
     def t_NUMBER(t):
         r'\d+'
         t.value = int(t.value)    
@@ -53,17 +74,15 @@ class Lexer():
         r'\n+'
         t.lexer.lineno += len(t.value)
 
-    def CHAR(self, t):
+    def t_CHAR(t):
         r'\'[^\']\''
         t.value = t.value[1]
         return t
 
-    def STRING(self, t):
+    def t_STRING(t):
         r'\"[^\"]*\"'
         t.value = t.value.replace('"', '')
         return t
-
-
 
     # Error handling rule
     def t_error(t):
@@ -95,7 +114,7 @@ class Parser():
         p[0] = p[1] != p[3]
 
     def p_expression_inc(p):
-        'expression : factor INC factor'
+        'expression : factor INC'
         p[0] = p[1] + 1
 
     def p_expression_le(p):
@@ -134,6 +153,10 @@ class Parser():
     def p_error(p):
         print("Syntax error in input!")
 
+
+ 
+
+
     # Build the parser
     parser = yacc.yacc()
 
@@ -149,8 +172,8 @@ def main():
             lexer.input(data)
 
             # Tokenize
-            #for tok in lexer:
-            #    print(tok)
+            for tok in lexer:
+                print(tok)
             result = parser.parse(data)
             print(result)
    

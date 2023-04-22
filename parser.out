@@ -1,5 +1,10 @@
 Created by PLY version 3.11 (http://www.dabeaz.com/ply)
 
+Unused terminals:
+
+    ELSE
+    IF
+
 Grammar
 
 Rule 0     S' -> expression
@@ -7,7 +12,7 @@ Rule 1     expression -> expression PLUS term
 Rule 2     expression -> expression MINUS term
 Rule 3     expression -> factor EQ factor
 Rule 4     expression -> factor NE factor
-Rule 5     expression -> factor INC factor
+Rule 5     expression -> factor INC
 Rule 6     expression -> factor LE factor
 Rule 7     expression -> factor ME factor
 Rule 8     expression -> term
@@ -20,7 +25,9 @@ Rule 13    factor -> LPAREN expression RPAREN
 Terminals, with rules where they appear
 
 DIVIDE               : 10
+ELSE                 : 
 EQ                   : 3
+IF                   : 
 INC                  : 5
 LE                   : 6
 LPAREN               : 13
@@ -36,7 +43,7 @@ error                :
 Nonterminals, with rules where they appear
 
 expression           : 1 2 13 0
-factor               : 3 3 4 4 5 5 6 6 7 7 9 10 11
+factor               : 3 3 4 4 5 6 6 7 7 9 10 11
 term                 : 1 2 8 9 10
 
 Parsing method: LALR
@@ -48,7 +55,7 @@ state 0
     (2) expression -> . expression MINUS term
     (3) expression -> . factor EQ factor
     (4) expression -> . factor NE factor
-    (5) expression -> . factor INC factor
+    (5) expression -> . factor INC
     (6) expression -> . factor LE factor
     (7) expression -> . factor ME factor
     (8) expression -> . term
@@ -93,7 +100,7 @@ state 3
 
     (3) expression -> factor . EQ factor
     (4) expression -> factor . NE factor
-    (5) expression -> factor . INC factor
+    (5) expression -> factor . INC
     (6) expression -> factor . LE factor
     (7) expression -> factor . ME factor
     (11) term -> factor .
@@ -135,7 +142,7 @@ state 5
     (2) expression -> . expression MINUS term
     (3) expression -> . factor EQ factor
     (4) expression -> . factor NE factor
-    (5) expression -> . factor INC factor
+    (5) expression -> . factor INC
     (6) expression -> . factor LE factor
     (7) expression -> . factor ME factor
     (8) expression -> . term
@@ -228,14 +235,13 @@ state 11
 
 state 12
 
-    (5) expression -> factor INC . factor
-    (12) factor -> . NUMBER
-    (13) factor -> . LPAREN expression RPAREN
+    (5) expression -> factor INC .
 
-    NUMBER          shift and go to state 4
-    LPAREN          shift and go to state 5
+    PLUS            reduce using rule 5 (expression -> factor INC .)
+    MINUS           reduce using rule 5 (expression -> factor INC .)
+    $end            reduce using rule 5 (expression -> factor INC .)
+    RPAREN          reduce using rule 5 (expression -> factor INC .)
 
-    factor                         shift and go to state 23
 
 state 13
 
@@ -246,7 +252,7 @@ state 13
     NUMBER          shift and go to state 4
     LPAREN          shift and go to state 5
 
-    factor                         shift and go to state 24
+    factor                         shift and go to state 23
 
 state 14
 
@@ -257,7 +263,7 @@ state 14
     NUMBER          shift and go to state 4
     LPAREN          shift and go to state 5
 
-    factor                         shift and go to state 25
+    factor                         shift and go to state 24
 
 state 15
 
@@ -265,7 +271,7 @@ state 15
     (1) expression -> expression . PLUS term
     (2) expression -> expression . MINUS term
 
-    RPAREN          shift and go to state 26
+    RPAREN          shift and go to state 25
     PLUS            shift and go to state 6
     MINUS           shift and go to state 7
 
@@ -356,16 +362,6 @@ state 22
 
 state 23
 
-    (5) expression -> factor INC factor .
-
-    PLUS            reduce using rule 5 (expression -> factor INC factor .)
-    MINUS           reduce using rule 5 (expression -> factor INC factor .)
-    $end            reduce using rule 5 (expression -> factor INC factor .)
-    RPAREN          reduce using rule 5 (expression -> factor INC factor .)
-
-
-state 24
-
     (6) expression -> factor LE factor .
 
     PLUS            reduce using rule 6 (expression -> factor LE factor .)
@@ -374,7 +370,7 @@ state 24
     RPAREN          reduce using rule 6 (expression -> factor LE factor .)
 
 
-state 25
+state 24
 
     (7) expression -> factor ME factor .
 
@@ -384,7 +380,7 @@ state 25
     RPAREN          reduce using rule 7 (expression -> factor ME factor .)
 
 
-state 26
+state 25
 
     (13) factor -> LPAREN expression RPAREN .
 

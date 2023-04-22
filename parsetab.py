@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'DIVIDE EQ INC LE LPAREN ME MINUS NE NUMBER PLUS RPAREN TIMESexpression : expression PLUS termexpression : expression MINUS termexpression : factor EQ factorexpression : factor NE factorexpression : factor INC factorexpression : factor LE factorexpression : factor ME factorexpression : termterm : term TIMES factorterm : term DIVIDE factorterm : factorfactor : NUMBERfactor : LPAREN expression RPAREN'
+_lr_signature = 'DIVIDE ELSE EQ IF INC LE LPAREN ME MINUS NE NUMBER PLUS RPAREN TIMESexpression : expression PLUS termexpression : expression MINUS termexpression : factor EQ factorexpression : factor NE factorexpression : factor INCexpression : factor LE factorexpression : factor ME factorexpression : termterm : term TIMES factorterm : term DIVIDE factorterm : factorfactor : NUMBERfactor : LPAREN expression RPAREN'
     
-_lr_action_items = {'NUMBER':([0,5,6,7,8,9,10,11,12,13,14,],[4,4,4,4,4,4,4,4,4,4,4,]),'LPAREN':([0,5,6,7,8,9,10,11,12,13,14,],[5,5,5,5,5,5,5,5,5,5,5,]),'$end':([1,2,3,4,16,17,18,19,20,21,22,23,24,25,26,],[0,-8,-11,-12,-1,-11,-2,-9,-10,-3,-4,-5,-6,-7,-13,]),'PLUS':([1,2,3,4,15,16,17,18,19,20,21,22,23,24,25,26,],[6,-8,-11,-12,6,-1,-11,-2,-9,-10,-3,-4,-5,-6,-7,-13,]),'MINUS':([1,2,3,4,15,16,17,18,19,20,21,22,23,24,25,26,],[7,-8,-11,-12,7,-1,-11,-2,-9,-10,-3,-4,-5,-6,-7,-13,]),'RPAREN':([2,3,4,15,16,17,18,19,20,21,22,23,24,25,26,],[-8,-11,-12,26,-1,-11,-2,-9,-10,-3,-4,-5,-6,-7,-13,]),'TIMES':([2,3,4,16,17,18,19,20,26,],[8,-11,-12,8,-11,8,-9,-10,-13,]),'DIVIDE':([2,3,4,16,17,18,19,20,26,],[9,-11,-12,9,-11,9,-9,-10,-13,]),'EQ':([3,4,26,],[10,-12,-13,]),'NE':([3,4,26,],[11,-12,-13,]),'INC':([3,4,26,],[12,-12,-13,]),'LE':([3,4,26,],[13,-12,-13,]),'ME':([3,4,26,],[14,-12,-13,]),}
+_lr_action_items = {'NUMBER':([0,5,6,7,8,9,10,11,13,14,],[4,4,4,4,4,4,4,4,4,4,]),'LPAREN':([0,5,6,7,8,9,10,11,13,14,],[5,5,5,5,5,5,5,5,5,5,]),'$end':([1,2,3,4,12,16,17,18,19,20,21,22,23,24,25,],[0,-8,-11,-12,-5,-1,-11,-2,-9,-10,-3,-4,-6,-7,-13,]),'PLUS':([1,2,3,4,12,15,16,17,18,19,20,21,22,23,24,25,],[6,-8,-11,-12,-5,6,-1,-11,-2,-9,-10,-3,-4,-6,-7,-13,]),'MINUS':([1,2,3,4,12,15,16,17,18,19,20,21,22,23,24,25,],[7,-8,-11,-12,-5,7,-1,-11,-2,-9,-10,-3,-4,-6,-7,-13,]),'RPAREN':([2,3,4,12,15,16,17,18,19,20,21,22,23,24,25,],[-8,-11,-12,-5,25,-1,-11,-2,-9,-10,-3,-4,-6,-7,-13,]),'TIMES':([2,3,4,16,17,18,19,20,25,],[8,-11,-12,8,-11,8,-9,-10,-13,]),'DIVIDE':([2,3,4,16,17,18,19,20,25,],[9,-11,-12,9,-11,9,-9,-10,-13,]),'EQ':([3,4,25,],[10,-12,-13,]),'NE':([3,4,25,],[11,-12,-13,]),'INC':([3,4,25,],[12,-12,-13,]),'LE':([3,4,25,],[13,-12,-13,]),'ME':([3,4,25,],[14,-12,-13,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'expression':([0,5,],[1,15,]),'term':([0,5,6,7,],[2,2,16,18,]),'factor':([0,5,6,7,8,9,10,11,12,13,14,],[3,3,17,17,19,20,21,22,23,24,25,]),}
+_lr_goto_items = {'expression':([0,5,],[1,15,]),'term':([0,5,6,7,],[2,2,16,18,]),'factor':([0,5,6,7,8,9,10,11,13,14,],[3,3,17,17,19,20,21,22,23,24,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,17 +27,17 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> expression","S'",1,None,None,None),
-  ('expression -> expression PLUS term','expression',3,'p_expression_plus','Algoris.py',82),
-  ('expression -> expression MINUS term','expression',3,'p_expression_minus','Algoris.py',86),
-  ('expression -> factor EQ factor','expression',3,'p_expression_eq','Algoris.py',90),
-  ('expression -> factor NE factor','expression',3,'p_expression_ne','Algoris.py',94),
-  ('expression -> factor INC factor','expression',3,'p_expression_inc','Algoris.py',98),
-  ('expression -> factor LE factor','expression',3,'p_expression_le','Algoris.py',102),
-  ('expression -> factor ME factor','expression',3,'p_expression_me','Algoris.py',106),
-  ('expression -> term','expression',1,'p_expression_term','Algoris.py',110),
-  ('term -> term TIMES factor','term',3,'p_term_times','Algoris.py',114),
-  ('term -> term DIVIDE factor','term',3,'p_term_div','Algoris.py',118),
-  ('term -> factor','term',1,'p_term_factor','Algoris.py',122),
-  ('factor -> NUMBER','factor',1,'p_factor_num','Algoris.py',126),
-  ('factor -> LPAREN expression RPAREN','factor',3,'p_factor_expr','Algoris.py',130),
+  ('expression -> expression PLUS term','expression',3,'p_expression_plus','Algoris.py',101),
+  ('expression -> expression MINUS term','expression',3,'p_expression_minus','Algoris.py',105),
+  ('expression -> factor EQ factor','expression',3,'p_expression_eq','Algoris.py',109),
+  ('expression -> factor NE factor','expression',3,'p_expression_ne','Algoris.py',113),
+  ('expression -> factor INC','expression',2,'p_expression_inc','Algoris.py',117),
+  ('expression -> factor LE factor','expression',3,'p_expression_le','Algoris.py',121),
+  ('expression -> factor ME factor','expression',3,'p_expression_me','Algoris.py',125),
+  ('expression -> term','expression',1,'p_expression_term','Algoris.py',129),
+  ('term -> term TIMES factor','term',3,'p_term_times','Algoris.py',133),
+  ('term -> term DIVIDE factor','term',3,'p_term_div','Algoris.py',137),
+  ('term -> factor','term',1,'p_term_factor','Algoris.py',141),
+  ('factor -> NUMBER','factor',1,'p_factor_num','Algoris.py',145),
+  ('factor -> LPAREN expression RPAREN','factor',3,'p_factor_expr','Algoris.py',149),
 ]
