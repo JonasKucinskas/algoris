@@ -11,7 +11,6 @@ class Lexer():
 
     literals = {'=', '+', '-', '/', '*', '(', ')', '{', '}', ',', ';', '>', '<', '!'}
 
-
     tokens = (
        'NUMBER',
        'PLUS',
@@ -20,6 +19,11 @@ class Lexer():
        'DIVIDE',
        'LPAREN',
        'RPAREN',
+       'EQ', 
+       'NE',
+       'LE',
+       'ME',
+       'INC',
     )
 
     # Regular expression rules for simple tokens
@@ -29,6 +33,14 @@ class Lexer():
     t_DIVIDE  = r'/'
     t_LPAREN  = r'\('
     t_RPAREN  = r'\)'
+
+    t_EQ = r'=='
+    t_NE = r'!='
+    t_LE = r'<='
+    t_ME = r'>='
+    t_INC = r'\+\+'
+
+
 
     # A regular expression rule with some action code
     def t_NUMBER(t):
@@ -51,6 +63,8 @@ class Lexer():
         t.value = t.value.replace('"', '')
         return t
 
+
+
     # Error handling rule
     def t_error(t):
         print("Illegal character '%s'" % t.value[0])
@@ -59,7 +73,6 @@ class Lexer():
 
     # Build the lexer
     lexer = lex.lex()    
-    # Test it out
 
 class Parser():
 
@@ -72,6 +85,26 @@ class Parser():
     def p_expression_minus(p):
         'expression : expression MINUS term'
         p[0] = p[1] - p[3]
+
+    def p_expression_eq(p):
+        'expression : factor EQ factor'
+        p[0] = p[1] == p[3]
+
+    def p_expression_ne(p):
+        'expression : factor NE factor'
+        p[0] = p[1] != p[3]
+
+    def p_expression_inc(p):
+        'expression : factor INC factor'
+        p[0] = p[1] + 1
+
+    def p_expression_le(p):
+        'expression : factor LE factor'
+        p[0] = p[1] <= p[3]
+
+    def p_expression_me(p):
+        'expression : factor ME factor'
+        p[0] = p[1] >= p[3]
 
     def p_expression_term(p):
         'expression : term'
@@ -110,24 +143,16 @@ def main():
 
     try:
         data = open(sys.argv[1]).read()
-        s = input('calc > ')
+        
         if data:
-
             # Give the lexer input
             lexer.input(data)
 
             # Tokenize
-            for tok in lexer:
-                print(tok)
-
-            while True:
-                try:
-                    s = input('input > ')
-                except EOFError:
-                    break
-                if not s: continue
-                result = parser.parse(s)
-                print(result)
+            #for tok in lexer:
+            #    print(tok)
+            result = parser.parse(data)
+            print(result)
    
 
     except (IndexError, FileNotFoundError) as e:
