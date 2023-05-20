@@ -283,7 +283,7 @@ class Lexer:
 		return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
 	def make_not_equals(self):
-		pos_start = self.pos.copy()
+		pos_start = self.pos_copy()
 		self.advance()
 
 		if self.current_char == '=':
@@ -514,7 +514,7 @@ class ParseResult:
 	
 	def try_register(self, res):
 		if res.error:
-			self.to_reverse_count = res.advance_count
+			self.to.reverse_count = res.advance_count
 			return None
 		return self.register(res)
 
@@ -1035,17 +1035,17 @@ class Parser:
 
 			if self.current_tok.type != TT_RSQUARE:
 				return res.failure(InvalidSyntaxError(
-				self.current_tok.pos_start, self.current_tok.pos_end,
-				f"Expected ',' or ']'\n"
+		  		self.current_tok.pos_start, self.current_tok.pos_end,
+		  		f"Expected ',' or ']'\n"
 				))
 
 			res.register_advancement()
 			self.advance()
 
 		return res.success(ListNode(
-			element_nodes,
-			pos_start,
-			self.current_tok.pos_end.copy()
+	  		element_nodes,
+	  		pos_start,
+	  		self.current_tok.pos_end.copy()
 			))
 
 
@@ -1783,10 +1783,10 @@ class BuiltInFunction(BaseFunction):
 		if not isinstance(fn, String):
 			return RTResult().failure(RTError(
 				self.pos_start, self.pos_end,
-				"Second argument must be string",
+				"Argument must be string", 
 				exec_ctx
 			))
-
+		
 		fn = fn.value
 
 		try:
@@ -1798,17 +1798,17 @@ class BuiltInFunction(BaseFunction):
 				f"Failed to load script \"{fn}\"\n" + str(e),
 				exec_ctx
 			))
-
+		
 		_, error = run(fn, script)
-	
+
 		if error:
 			return RTResult().failure(RTError(
 				self.pos_start, self.pos_end,
-				f"Failed to finish executing script \"{fn}\"\n" +
+				f"Failed to finish executing script \"{fn}\"\n" + 
 				error.as_string(),
 				exec_ctx
 			))
-
+			
 		return RTResult().success(Number.null)
 	execute_run.arg_names = ["fn"]
 

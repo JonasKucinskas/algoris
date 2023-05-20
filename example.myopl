@@ -1,0 +1,27 @@
+VAR result = 0
+VAR len = 5
+FOR i = 0 TO len THEN
+ 		VAR result = result + i
+        PRINT(result)
+END  	
+
+ 
+VAR new_elements = []
+FOR i = 0 TO 5 THEN
+	PRINT(i)
+END  	
+
+ 
+ 
+
+PRINT("Greetings universe!")  
+
+STARTTEST(30000)
+
+
+FOR i = 0 TO 30000 THEN 	
+    PRINT(i)
+END
+
+STOPTEST()
+MAKEGRAPH()
