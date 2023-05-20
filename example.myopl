@@ -16,12 +16,17 @@ END
 
 PRINT("Greetings universe!")  
 
-STARTTEST(30000)
+STARTTEST(200)
 
 
-FOR i = 0 TO 30000 THEN 	
-    PRINT(i)
+FOR i = 0 TO 200 THEN 	
+    
+    FOR j = 0 TO 200 THEN
+        PRINT(i)
+        
+        PRINT(j)
+    END
 END
 
 STOPTEST()
-MAKEGRAPH()
+
