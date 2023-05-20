@@ -1,9 +1,9 @@
-import algoris
+import Algoris
 
 while True:
     text = input('algoris > ')
     if text.strip() == "": continue
-    result, error = algoris.run('<stdin>', text)
+    result, error = Algoris.run('<stdin>', text)
 
     if error:
         print(error.as_string())

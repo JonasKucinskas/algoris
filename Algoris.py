@@ -1,6 +1,8 @@
 from string_with_arrows import *
 import string
 import os
+import time
+import matplotlib.pyplot as plt
 
 DIGITS = '0123456789'
 LETTERS = string.ascii_letters
@@ -1551,7 +1553,11 @@ class Function(BaseFunction):
 		return f"<function {self.name}>"
 
 
-
+start_time = 0
+end_time = 0
+last_count = 0
+control_count = 0
+graph_values = {}
 class BuiltInFunction(BaseFunction):
 	def __init__(self, name):
 		super().__init__(name)
@@ -1696,6 +1702,83 @@ class BuiltInFunction(BaseFunction):
 		return RTResult().success(Number.null)
 	execute_extend.arg_names = ["listA", "listB"]
 
+	def execute_starttest(self, exec_ctx):
+		global start_time, last_count, control_count
+
+		count = exec_ctx.symbol_table.get("count")
+
+		if not isinstance(count, Number):
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"Argument must be an integer\n",
+				exec_ctx
+			))
+
+		if count.value < 0:
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"You must enter a positive number\n",
+				exec_ctx
+			))
+		
+		if control_count != 0:
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"You must stop outgoing test with stoptest()\n",
+				exec_ctx
+			))
+
+		last_count = int(count.value)
+		start_time = int(time.time())
+		control_count = 1
+		return RTResult().success(Number.null)
+	execute_starttest.arg_names = ["count"]
+
+	def execute_stoptest(self, exec_ctx):
+		global start_time, end_time, last_count, graph_values, control_count
+
+		if control_count != 1:
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"You must start a test with starttest(elementcount)\n",
+				exec_ctx
+			))
+		
+		end_time = int(time.time())
+		elapsed_time = end_time - start_time
+		graph_values[last_count] = elapsed_time
+		last_count = 0
+		elapsed_time = 0
+		start_time = 0
+		end_time = 0
+		control_count = 0
+		return RTResult().success(Number.null)
+	execute_stoptest.arg_names = []
+
+	def execute_makegraph(self, exec_ctx):
+		global graph_values, control_count
+
+		if control_count != 0:
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"You must stop outgoing test with stoptest()\n",
+				exec_ctx
+			))
+
+		counts = list(graph_values.keys())
+		times = list(graph_values.values())
+		graph_values.clear()
+		plt.plot(counts, times, marker='o')
+		plt.xlabel('Element count')
+		plt.ylabel('Elapsed time (s)')
+		plt.title('Elapsed time and element count')
+		plt.grid(True)
+		plt.show()
+		return RTResult().success(Number.null)
+	execute_makegraph.arg_names = []
+
+	
+
 BuiltInFunction.print = BuiltInFunction("print")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
 BuiltInFunction.input = BuiltInFunction("input")
@@ -1708,6 +1791,9 @@ BuiltInFunction.is_function = BuiltInFunction("is_function")
 BuiltInFunction.append = BuiltInFunction("append")
 BuiltInFunction.pop = BuiltInFunction("pop")
 BuiltInFunction.extend = BuiltInFunction("extend")
+BuiltInFunction.starttest = BuiltInFunction("starttest")
+BuiltInFunction.stoptest = BuiltInFunction("stoptest")
+BuiltInFunction.makegraph = BuiltInFunction("makegraph")
 
 
 class Context:
@@ -1965,6 +2051,9 @@ global_symbol_table.set("IS_FUN", BuiltInFunction.is_function)
 global_symbol_table.set("APPEND", BuiltInFunction.append)
 global_symbol_table.set("POP", BuiltInFunction.pop)
 global_symbol_table.set("EXTEND", BuiltInFunction.extend)
+global_symbol_table.set("STARTTEST", BuiltInFunction.starttest)
+global_symbol_table.set("STOPTEST", BuiltInFunction.stoptest)
+global_symbol_table.set("MAKEGRAPH", BuiltInFunction.makegraph)
 
 
 
