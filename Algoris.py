@@ -1620,6 +1620,7 @@ start_time = 0
 end_time = 0
 last_count = 0
 control_count = 0
+nodes_count = 0
 graph_values = {}
 class BuiltInFunction(BaseFunction):
 	def __init__(self, name):
@@ -1803,7 +1804,7 @@ class BuiltInFunction(BaseFunction):
 	execute_starttest.arg_names = ["count"]
 
 	def execute_stoptest(self, exec_ctx):
-		global start_time, end_time, last_count, graph_values, control_count
+		global start_time, end_time, last_count, graph_values, control_count, nodes_count
 
 		if control_count != 1:
 			return RTResult().failure(RTError(
@@ -1820,16 +1821,24 @@ class BuiltInFunction(BaseFunction):
 		start_time = 0
 		end_time = 0
 		control_count = 0
+		nodes_count = nodes_count + 1
 		return RTResult().success(Number.null)
 	execute_stoptest.arg_names = []
 
 	def execute_makegraph(self, exec_ctx):
-		global graph_values, control_count
+		global graph_values, control_count, nodes_count
 
 		if control_count != 0:
 			return RTResult().failure(RTError(
 				self.pos_start, self.pos_end,
 				"You must stop outgoing test with stoptest()\n",
+				exec_ctx
+			))
+
+		if nodes_count < 2:
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"You must do atleast 2 tests\n",
 				exec_ctx
 			))
 
@@ -1840,8 +1849,9 @@ class BuiltInFunction(BaseFunction):
 
 		analyzer = TimeComplexityAnalyzer()
 		analyzer.analyze_execution_time(counts, times)
+		nodes_count = 0
 
-		#graph_values.clear()
+		graph_values.clear()
 		#plt.plot(counts, times, marker='o')
 		#plt.xlabel('Element count')
 		#plt.ylabel('Elapsed time (s)')
@@ -1857,7 +1867,7 @@ class BuiltInFunction(BaseFunction):
 		if not isinstance(fn, String):
 			return RTResult().failure(RTError(
 				self.pos_start, self.pos_end,
-				"Second argument must be string",
+				"Argument must be string\n",
 				exec_ctx
 			))
 
@@ -1886,6 +1896,38 @@ class BuiltInFunction(BaseFunction):
 		return RTResult().success(Number.null)
 	execute_run.arg_names = ["fn"]
 
+	def execute_double(self, exec_ctx):
+		list_ = exec_ctx.symbol_table.get("list")
+		if not isinstance(list_, List):
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"Argument must be of type list\n",
+				exec_ctx
+			))
+
+		my_list = list_.elements
+		new_list = my_list * 2
+		list_.elements = new_list
+		return RTResult().success(list_)
+	execute_double.arg_names = ['list']
+
+	def execute_count(self, exec_ctx):
+		list_ = exec_ctx.symbol_table.get("list")
+		if not isinstance(list_, List):
+			return RTResult().failure(RTError(
+				self.pos_start, self.pos_end,
+				"Argument must be of type list\n",
+				exec_ctx
+			))
+		my_list = list_.elements
+		count = len(my_list)
+		count = Number(count)
+		return RTResult().success(count)
+	execute_count.arg_names = ['list']
+
+
+
+
 BuiltInFunction.print = BuiltInFunction("print")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
 BuiltInFunction.input = BuiltInFunction("input")
@@ -1902,6 +1944,8 @@ BuiltInFunction.starttest = BuiltInFunction("starttest")
 BuiltInFunction.stoptest = BuiltInFunction("stoptest")
 BuiltInFunction.makegraph = BuiltInFunction("makegraph")
 BuiltInFunction.run	= BuiltInFunction("run")
+BuiltInFunction.double = BuiltInFunction("double")
+BuiltInFunction.count = BuiltInFunction("count")
 
 class Context:
 	def __init__(self, display_name, parent=None, parent_entry_pos=None):
@@ -2162,6 +2206,8 @@ global_symbol_table.set("STARTTEST", BuiltInFunction.starttest)
 global_symbol_table.set("STOPTEST", BuiltInFunction.stoptest)
 global_symbol_table.set("MAKEGRAPH", BuiltInFunction.makegraph)
 global_symbol_table.set("RUN", BuiltInFunction.run)
+global_symbol_table.set("DOUBLE", BuiltInFunction.double)
+global_symbol_table.set("COUNT", BuiltInFunction.count)
 
 
 def run(fn, text):

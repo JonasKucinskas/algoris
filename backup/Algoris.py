@@ -3,6 +3,8 @@ import string
 import os
 import time
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.optimize import curve_fit
 
 DIGITS = '0123456789'
 LETTERS = string.ascii_letters
@@ -283,7 +285,7 @@ class Lexer:
 		return Token(tok_type, pos_start=pos_start, pos_end=self.pos)
 
 	def make_not_equals(self):
-		pos_start = self.pos_copy()
+		pos_start = self.pos.copy()
 		self.advance()
 
 		if self.current_char == '=':
@@ -514,7 +516,7 @@ class ParseResult:
 	
 	def try_register(self, res):
 		if res.error:
-			self.to.reverse_count = res.advance_count
+			self.to_reverse_count = res.advance_count
 			return None
 		return self.register(res)
 
@@ -1035,17 +1037,17 @@ class Parser:
 
 			if self.current_tok.type != TT_RSQUARE:
 				return res.failure(InvalidSyntaxError(
-		  		self.current_tok.pos_start, self.current_tok.pos_end,
-		  		f"Expected ',' or ']'\n"
+				self.current_tok.pos_start, self.current_tok.pos_end,
+				f"Expected ',' or ']'\n"
 				))
 
 			res.register_advancement()
 			self.advance()
 
 		return res.success(ListNode(
-	  		element_nodes,
-	  		pos_start,
-	  		self.current_tok.pos_end.copy()
+			element_nodes,
+			pos_start,
+			self.current_tok.pos_end.copy()
 			))
 
 
@@ -1552,6 +1554,67 @@ class Function(BaseFunction):
 	def __repr__(self):
 		return f"<function {self.name}>"
 
+class TimeComplexityAnalyzer:
+	def __init__(self):
+		self.models = [self.linear_model, self.quadratic_model]
+	
+	def linear_model(self, n, a):
+		return a * np.array(n)
+
+	def quadratic_model(self, n, a):
+		return a * np.array(n)**2
+
+	def fit_data_to_model(self, model, xdata, ydata):
+		popt, _ = curve_fit(model, xdata, ydata)
+		return popt
+
+	def calculate_r_squared(self, ydata, ymodel):
+		residuals = ydata - ymodel
+		ss_residuals = np.sum(residuals**2)
+		ss_total = np.sum((ydata - np.mean(ydata))**2)
+		r_squared = 1 - (ss_residuals / ss_total)
+		return r_squared
+
+	def find_best_fit_model(self, xdata, ydata):
+		best_model = None
+		best_r_squared = -np.inf
+		
+		for model in self.models:
+			popt = self.fit_data_to_model(model, xdata, ydata)
+			ymodel = model(xdata, *popt)
+			r_squared = self.calculate_r_squared(ydata, ymodel)
+			
+			if r_squared > best_r_squared:
+				best_r_squared = r_squared
+				best_model = model
+		
+		return best_model
+
+	def calculate_time_complexity(self, model):
+		if model == self.linear_model:
+			return 'Linear time complexity (O(n))'
+		elif model == self.quadratic_model:
+			return 'Quadratic time complexity (O(n^2))'
+		else:
+			return 'Unknown time complexity'
+
+	def analyze_execution_time(self, n_values, execution_times):
+		# Step 5: Fit the data to models and find the best-fit model
+		best_model = self.find_best_fit_model(n_values, execution_times)
+
+		# Step 6: Calculate time complexity from the best-fit model
+		time_complexity = self.calculate_time_complexity(best_model)
+
+		# Plotting the execution time measurements and the best-fit model
+		plt.scatter(n_values, execution_times, label='Execution Time')
+		plt.plot(n_values, best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times)), 'r-', label=time_complexity)
+		plt.xlabel('n')
+		plt.ylabel('Execution Time')
+		plt.legend()
+		plt.show()
+
+		# Print the estimated time complexity
+		print('Estimated Time Complexity:', time_complexity)
 
 start_time = 0
 end_time = 0
@@ -1561,6 +1624,9 @@ graph_values = {}
 class BuiltInFunction(BaseFunction):
 	def __init__(self, name):
 		super().__init__(name)
+
+
+		
 
 	def execute(self, args):
 		res = RTResult()
@@ -1728,6 +1794,8 @@ class BuiltInFunction(BaseFunction):
 				exec_ctx
 			))
 
+		
+
 		last_count = int(count.value)
 		start_time = int(time.time())
 		control_count = 1
@@ -1767,13 +1835,19 @@ class BuiltInFunction(BaseFunction):
 
 		counts = list(graph_values.keys())
 		times = list(graph_values.values())
-		graph_values.clear()
-		plt.plot(counts, times, marker='o')
-		plt.xlabel('Element count')
-		plt.ylabel('Elapsed time (s)')
-		plt.title('Elapsed time and element count')
-		plt.grid(True)
-		plt.show()
+
+		
+
+		analyzer = TimeComplexityAnalyzer()
+		analyzer.analyze_execution_time(counts, times)
+
+		#graph_values.clear()
+		#plt.plot(counts, times, marker='o')
+		#plt.xlabel('Element count')
+		#plt.ylabel('Elapsed time (s)')
+		#plt.title('Elapsed time and element count')
+		#plt.grid(True)
+		#plt.show()
 		return RTResult().success(Number.null)
 	execute_makegraph.arg_names = []
 
@@ -1783,10 +1857,10 @@ class BuiltInFunction(BaseFunction):
 		if not isinstance(fn, String):
 			return RTResult().failure(RTError(
 				self.pos_start, self.pos_end,
-				"Argument must be string", 
+				"Second argument must be string",
 				exec_ctx
 			))
-		
+
 		fn = fn.value
 
 		try:
@@ -1798,17 +1872,17 @@ class BuiltInFunction(BaseFunction):
 				f"Failed to load script \"{fn}\"\n" + str(e),
 				exec_ctx
 			))
-		
-		_, error = run(fn, script)
 
+		_, error = run(fn, script)
+	
 		if error:
 			return RTResult().failure(RTError(
 				self.pos_start, self.pos_end,
-				f"Failed to finish executing script \"{fn}\"\n" + 
+				f"Failed to finish executing script \"{fn}\"\n" +
 				error.as_string(),
 				exec_ctx
 			))
-			
+
 		return RTResult().success(Number.null)
 	execute_run.arg_names = ["fn"]
 
