@@ -1556,10 +1556,13 @@ class Function(BaseFunction):
 
 class TimeComplexityAnalyzer:
 	def __init__(self):
-		self.models = [self.linear_model, self.quadratic_model]
+		self.models = [self.linear_model, self.quadratic_model, self.constant_model]
 	
 	def linear_model(self, n, a):
 		return a * np.array(n)
+
+	def constant_model(self, n, a):
+		return a * np.ones_like(n)
 
 	def quadratic_model(self, n, a):
 		return a * np.array(n)**2
@@ -1595,6 +1598,8 @@ class TimeComplexityAnalyzer:
 			return 'Linear time complexity (O(n))'
 		elif model == self.quadratic_model:
 			return 'Quadratic time complexity (O(n^2))'
+		elif model == self.constant_model:
+			return 'Constant time complexity (O(1))'
 		else:
 			return 'Unknown time complexity'
 
@@ -1607,7 +1612,12 @@ class TimeComplexityAnalyzer:
 
 		# Plotting the execution time measurements and the best-fit model
 		plt.scatter(n_values, execution_times, label='Execution Time')
-		plt.plot(n_values, best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times)), 'r-', label=time_complexity)
+
+		bestmodel = best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times))
+
+		
+
+		plt.plot(n_values, best_model(n_values, bestmodel), 'r-', label=time_complexity)
 		plt.xlabel('n')
 		plt.ylabel('Execution Time')
 		plt.legend()
