@@ -13,7 +13,7 @@ WHILE count < 100000 THEN
             APPEND(b, j)
         END
     STOPTEST()
-    VAR a = a*a
+    VAR a = DOUBLE(a)
     VAR count = COUNT(a)
 END
 MAKEGRAPH()

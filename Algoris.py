@@ -1613,11 +1613,11 @@ class TimeComplexityAnalyzer:
 		# Plotting the execution time measurements and the best-fit model
 		plt.scatter(n_values, execution_times, label='Execution Time')
 
-		bestmodel = best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times))
+		#bestmodel = best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times))
 
 		
 
-		plt.plot(n_values, best_model(n_values, bestmodel), 'r-', label=time_complexity)
+		plt.plot(n_values, best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times)), 'r-', label=time_complexity)
 		plt.xlabel('n')
 		plt.ylabel('Execution Time')
 		plt.legend()
