@@ -1562,7 +1562,7 @@ class TimeComplexityAnalyzer:
 		return a * np.array(n)
 
 	def constant_model(self, n, a):
-		return a * np.ones_like(n)
+		return a * np.zeros_like(n)
 
 	def quadratic_model(self, n, a):
 		return a * np.array(n)**2
@@ -1604,18 +1604,17 @@ class TimeComplexityAnalyzer:
 			return 'Unknown time complexity'
 
 	def analyze_execution_time(self, n_values, execution_times):
-		# Step 5: Fit the data to models and find the best-fit model
-		best_model = self.find_best_fit_model(n_values, execution_times)
 
-		# Step 6: Calculate time complexity from the best-fit model
-		time_complexity = self.calculate_time_complexity(best_model)
+		deviation = 1
 
-		# Plotting the execution time measurements and the best-fit model
-		plt.scatter(n_values, execution_times, label='Execution Time')
-
-		#bestmodel = best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times))
-
+		if min(execution_times) + deviation >= max(execution_times):
+			best_model = self.constant_model
+		else:
+			best_model = self.find_best_fit_model(n_values, execution_times)
 		
+
+		time_complexity = self.calculate_time_complexity(best_model)
+		plt.scatter(n_values, execution_times, label='Execution Time')
 
 		plt.plot(n_values, best_model(n_values, *self.fit_data_to_model(best_model, n_values, execution_times)), 'r-', label=time_complexity)
 		plt.xlabel('n')

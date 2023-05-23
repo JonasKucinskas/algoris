@@ -1841,7 +1841,7 @@ class BuiltInFunction(BaseFunction):
 		analyzer = TimeComplexityAnalyzer()
 		analyzer.analyze_execution_time(counts, times)
 
-		#graph_values.clear()
+		graph_values.clear()
 		#plt.plot(counts, times, marker='o')
 		#plt.xlabel('Element count')
 		#plt.ylabel('Elapsed time (s)')
